@@ -1,44 +1,29 @@
-import { defineConfig, Plugin } from "vite";
+// Configuración de Vite (Versión Final CORRECTA)
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import dotenv from "dotenv";
 
-// Load environment variables before anything else
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
 
-import { createServer } from "./server";
-
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
     fs: {
-      allow: ["./client", "./shared"],
+      allow: ["./client", "./shared", "./paginas"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
   },
-  build: {
-    outDir: "dist/spa",
-  },
-  plugins: [react(), expressPlugin()],
+  plugins: [react()], 
   resolve: {
+    // Aseguramos que los alias apunten a la subcarpeta
     alias: {
-      "@": path.resolve(__dirname, "./client"),
+      "@": path.resolve(__dirname, "./paginas/client"),
       "@shared": path.resolve(__dirname, "./shared"),
     },
   },
+  define: {
+    "process.env.NODE_ENV": '"production"',
+  },
 }));
-
-function expressPlugin(): Plugin {
-  return {
-    name: "express-plugin",
-    apply: "serve", // Only apply during development (serve mode)
-    configureServer(server) {
-      const app = createServer();
-
-      // Add Express app as middleware to Vite dev server
-      server.middlewares.use(app);
-    },
-  };
-}
