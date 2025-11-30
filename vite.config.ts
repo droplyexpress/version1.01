@@ -24,7 +24,6 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     // Carpeta de salida para la parte visible (cliente)
-    outDir: "dist/spa",
   },
   // SOLO se incluye el plugin de React, se elimina el plugin de Express (servidor)
   plugins: [react()], 
