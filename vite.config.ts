@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
 
+// Forzando cache-bust
 export default defineConfig(({ mode }) => ({
   // ¡CLAVE! Esto soluciona el error 404 de main.tsx y sw.js
   // Fuerza a Vite a generar todas las rutas de assets desde la raíz del dominio.
