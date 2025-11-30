@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Droply Express - Sistema de Reparto para Repartidores"
+    />
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Droply Repartidor" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="msapplication-TileColor" content="#3b82f6" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Favicon - Droply Bird Logo -->
+    <link
+      rel="icon"
+      href="https://cdn.builder.io/api/v1/image/assets%2Fac0733f9e4544c449dd919f4664edbd3%2F8e406251f9b9456c875912f6b1bafd62?format=webp&width=200"
+    />
+
+    <!-- Apple icons for iOS -->
+    <link
+      rel="apple-touch-icon"
+      href="https://cdn.builder.io/api/v1/image/assets%2Fac0733f9e4544c449dd919f4664edbd3%2F8e406251f9b9456c875912f6b1bafd62?format=webp&width=180"
+    />
+
+    <title>Droply Express</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        background: white;
+      }
+      #root {
+        width: 100%;
+        height: 100%;
+        background: white;
+      }
+      body > :not(#root) {
+        display: none !important;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .spinner {
+        width: 60px;
+        height: 60px;
+        border: 3px solid #e5e7eb;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <div class="initial-loader"><div class="spinner"></div></div>
+
+    <script>
+      // Prevent any other UI from showing
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+    </script>
+
+    <script type="module" src="/client/main.tsx"></script>
+
+    <!-- Service Worker Registration for PWA -->
+    <script>
+      // Store install prompt globally for React components
+      window.__deferredPrompt = null;
+
+      // Detect current path
+      const currentPath = window.location.pathname;
+      const isDriverPath = currentPath.startsWith("/driver");
+
+      console.log(
+        "[PWA] Current path:",
+        currentPath,
+        "Is driver path:",
+        isDriverPath,
+      );
+
+      // Handle PWA install prompt - set up BEFORE Service Worker registration
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        window.__deferredPrompt = e;
+        console.log("[PWA] Install prompt captured and stored");
+        // Dispatch custom event for React components
+        window.dispatchEvent(
+          new CustomEvent("installPromptReady", { detail: e }),
+        );
+      });
+
+      // Register Service Worker for PWA functionality
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/sw.js", {
+            scope: "/",
+          })
+          .then((registration) => {
+            console.log(
+              "[PWA] Service Worker registered successfully:",
+              registration.scope,
+            );
+
+            // Check for updates
+            registration.addEventListener("updatefound", () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener("statechange", () => {
+                if (
+                  newWorker.state === "installed" &&
+                  navigator.serviceWorker.controller
+                ) {
+                  console.log("[PWA] New version available");
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.warn("[PWA] Service Worker registration failed:", error);
+          });
+      }
+
+      // Check if PWA is supported
+      console.log(
+        "[PWA] Service Worker support:",
+        "serviceWorker" in navigator,
+      );
+      console.log(
+        "[PWA] Manifest link present:",
+        !!document.querySelector('link[rel="manifest"]'),
+      );
+    </script>
+  </body>
+</html>

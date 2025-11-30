@@ -1,0 +1,36 @@
+# Fly.io configuration
+app = "droply-express"
+primary_region = "mad"
+
+[build]
+builder = "heroku"
+
+[env]
+VITE_SUPABASE_URL = "https://htztumtobwugrhrpjnsr.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0enR1bXRvYnd1Z3JocnBqbnNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMwNjE0NzUsImV4cCI6MjA3ODYzNzQ3NX0.hXQvY01-MDQmFzGc6bJHU1s5tl2L1vflClHGM7iQdjY"
+VITE_GOOGLE_MAPS_API_KEY = "AIzaSyAjt7uIw6A6eMK7KVsCC3D26DvgJhLhjj8"
+SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0enR1bXRvYnd1Z3JocnBqbnNyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzA2MTQ3NSwiZXhwIjoyMDc4NjM3NDc1fQ.snV80yU9D__YxiKq40FNSJAjknocrznZZm72ZUQ2nBM"
+
+[http_service]
+internal_port = 8080
+force_https = true
+auto_stop_machines = true
+auto_start_machines = true
+min_machines_running = 1
+
+[[services]]
+internal_port = 8080
+protocol = "tcp"
+auto_stop_machines = true
+auto_start_machines = true
+min_machines_running = 1
+
+[services.concurrency]
+type = "connections"
+hard_limit = 1000
+soft_limit = 200
+
+[[vm]]
+cpu_kind = "shared"
+cpus = 1
+memory_mb = 256
